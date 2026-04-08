@@ -75,7 +75,7 @@ export interface IAppletRecord {
   // };
 }
 
-export interface IInstalledAppletRecord {
+export interface IInstallationDetailsRecord {
   uuid: UUID;
   appliedConfigurations?: IAppletConfigurations;
   isHidden?: boolean;
@@ -83,7 +83,13 @@ export interface IInstalledAppletRecord {
 }
 
 export interface IFullAppletRecord extends IAppletRecord {
-  installedApplet?: IInstalledAppletRecord;
+  installationDetails?: IInstallationDetailsRecord;
+  isInstalled: boolean;
+}
+
+export interface IInstalledAppletRecord extends IAppletRecord {
+  installationDetails: IInstallationDetailsRecord;
+  isInstalled: true;
 }
 
 export interface IApplet extends IAppletRecord {
@@ -91,10 +97,16 @@ export interface IApplet extends IAppletRecord {
   categories: ICategory[];
 }
 
-export interface IInstalledApplet extends IInstalledAppletRecord {
+export interface IInstallationDetails extends IInstallationDetailsRecord {
   image: IAppletImage;
 }
 
 export interface IFullApplet extends IApplet {
-  installedApplet?: IInstalledApplet;
+  installationDetails?: IInstallationDetails;
+  isInstalled: boolean;
+}
+
+export interface IInstalledApplet extends IApplet {
+  installationDetails: IInstallationDetails;
+  isInstalled: true;
 }

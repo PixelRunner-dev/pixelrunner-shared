@@ -8,6 +8,7 @@ export type {
   IApplet,
   IInstalledApplet,
   IFullApplet,
+  IInstallationDetails,
   IAppletConfigurations,
   IAppletViews,
   IAppletSchema,
