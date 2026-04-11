@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 export function getDir({ pathSuffix = '' } = {}) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    return path.join(__dirname, '../../../../', pathSuffix);
+    return path.join(__dirname, '../../../', pathSuffix);
 }
 /**
  * Returns a file path by joining the storage path, the file name and the file extension.

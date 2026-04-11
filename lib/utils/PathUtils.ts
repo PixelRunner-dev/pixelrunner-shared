@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 export function getDir({ pathSuffix = '' }: { pathSuffix?: string; } = {}): string {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  return path.join(__dirname, '../../../../', pathSuffix);
+  return path.join(__dirname, '../../../', pathSuffix);
 }
 
 /**
