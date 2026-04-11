@@ -3,10 +3,13 @@
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist"
   },
   "include": [
+    "index.ts",
     "lib/**/*"
   ]
 }

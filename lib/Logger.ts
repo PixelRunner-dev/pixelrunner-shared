@@ -12,7 +12,7 @@ import { env } from 'node:process';
 
 import { addColors, createLogger, format, transports } from 'winston';
 
-import { getDir } from './utils/PathUtils.ts';
+import { getDir } from './utils/PathUtils.js';
 
 const consoleFormat = format.printf(({ level, message, timestamp }): string =>
   `${timestamp} [${level}](${env.npm_package_config_project_name}): ${message}`);

@@ -5,7 +5,16 @@
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./lib/*": "./dist/lib/*"
+  },
   "author": "Pixelrunner",
   "homepage": "https://pixelrunner.dev",
   "audit-level": "moderate",
@@ -41,7 +50,9 @@
     "Noderunners"
   ],
   "scripts": {
-    "type-check": "npx tsc --noEmit",
+    "build": "tsc && cp -r lib/interfaces dist/lib/interfaces && cp lib/types.d.ts dist/lib/types.d.ts",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
     "remote:npm-install": "npx remote-npm install",
     "remote:push": "npx remote-push",
     "remote:poweroff": "npx remote-poweroff",
@@ -49,7 +60,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@types/node": "^24.0.13"
+    "@types/node": "^24.0.13",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
@@ -58,7 +70,6 @@
     "globals": "^16.3.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
-    "winston": "^3.19.0"
+    "typescript-eslint": "^8.36.0"
   }
 }
