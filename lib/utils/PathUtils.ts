@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 export function getDir({ pathSuffix = '' }: { pathSuffix?: string; } = {}): string {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  return path.resolve(__dirname, '../../../', process.env.npm_package_config_project_name ?? 'shared', pathSuffix);
+  return path.resolve(__dirname, '../../../', pathSuffix);
 }
 
 /**
