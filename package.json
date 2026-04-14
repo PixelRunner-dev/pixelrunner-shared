@@ -51,7 +51,7 @@
   ],
   "scripts": {
     "prepack": "npm run build",
-    "build": "tsc",
+    "build": "tsc && cp -r lib/interfaces/*.d.ts dist/lib/interfaces && cp -r lib/interfaces/standard dist/lib/interfaces && cp -r lib/interfaces/ws-api dist/lib/interfaces && cp -r lib/types.d.ts dist/lib",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
     "remote:npm-install": "npx remote-npm install",
