@@ -51,7 +51,7 @@
   ],
   "scripts": {
     "prepack": "npm run build",
-    "build": "tsc && cp -r lib/interfaces dist/lib/interfaces && cp lib/types.d.ts dist/lib/types.d.ts",
+    "build": "tsc",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
     "remote:npm-install": "npx remote-npm install",

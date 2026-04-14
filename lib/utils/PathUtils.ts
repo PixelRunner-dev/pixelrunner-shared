@@ -8,8 +8,22 @@
  * @license CC-BY-NC-ND-4.0
  */
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+export function getProjectRoot(filePath: string): string {
+  let currentDir: string = path.dirname(path.resolve(filePath));
+
+  while (currentDir !== '/') {
+    if (!currentDir.includes('node_modules') && fs.existsSync(path.resolve(currentDir, 'package.json'))) {
+      return currentDir;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+
+  throw new Error('Could not find project root');
+}
 
 /**
  * Returns a directory path relative to the project root.
@@ -20,8 +34,8 @@ import { fileURLToPath } from 'node:url';
  */
 export function getDir({ pathSuffix = '' }: { pathSuffix?: string; } = {}): string {
   const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  return path.join(__dirname, '../../', pathSuffix);
+  const projectRoot = getProjectRoot(__filename);
+  return path.join(projectRoot, pathSuffix);
 }
 
 /**

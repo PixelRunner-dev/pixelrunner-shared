@@ -11,5 +11,5 @@
 export { ChildManager, cm } from './lib/ChildManager.js';
 export { logger } from './lib/Logger.js';
 // Re-export utility functions
-export { getDir, getFilePath, getFileNameFromFilePath } from './lib/utils/PathUtils.js';
+export { getDir, getFilePath, getFileNameFromFilePath, getProjectRoot } from './lib/utils/PathUtils.js';
 export { slugify } from './lib/utils/StringUtils.js';

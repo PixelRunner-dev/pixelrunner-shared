@@ -7,6 +7,7 @@
  * @copyright Pixelrunner (https://pixelrunner.dev)
  * @license CC-BY-NC-ND-4.0
  */
+export declare function getProjectRoot(filePath: string): string;
 /**
  * Returns a directory path relative to the project root.
  * If pathSuffix is provided, it will be appended to the directory path.

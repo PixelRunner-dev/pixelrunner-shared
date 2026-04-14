@@ -16,7 +16,8 @@ export { logger } from './lib/Logger.js';
 export {
   getDir,
   getFilePath,
-  getFileNameFromFilePath
+  getFileNameFromFilePath,
+  getProjectRoot
 } from './lib/utils/PathUtils.js';
 export { slugify } from './lib/utils/StringUtils.js';
 
