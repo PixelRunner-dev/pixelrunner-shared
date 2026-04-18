@@ -12,8 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./lib/*": "./dist/lib/*",
-    "./backend": "./dist/index.backend-only.js"
+     "./lib/*": "./dist/lib/*",
+     "./backend": {
+       "types": "./dist/index.backend-only.d.ts",
+       "import": "./dist/index.backend-only.js"
+     }
   },
   "author": "Pixelrunner",
   "homepage": "https://pixelrunner.dev",
