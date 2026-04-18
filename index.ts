@@ -8,11 +8,6 @@
  * @license CC-BY-NC-ND-4.0
  */
 
-// Re-export classes and utilities
-export { ChildManager, cm } from './lib/ChildManager.js';
-export { logger } from './lib/Logger.js';
-
-// Re-export utility functions
 export {
   getDir,
   getFilePath,
@@ -21,7 +16,6 @@ export {
 } from './lib/utils/PathUtils.js';
 export { slugify } from './lib/utils/StringUtils.js';
 
-// Re-export types from interfaces
 export type {
   IApplet,
   IAppletRecord,
