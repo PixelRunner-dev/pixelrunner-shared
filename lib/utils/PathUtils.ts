@@ -10,7 +10,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+
+/**
+ * Convert a file URL to a file path.
+ * This works in both Node and browser environments.
+ */
+function fileURLToPath(url: string): string {
+  return new URL(url).pathname;
+}
 
 export function getProjectRoot(filePath: string): string {
   let currentDir: string = path.dirname(path.resolve(filePath));
@@ -32,7 +39,7 @@ export function getProjectRoot(filePath: string): string {
  * @param {string} [options.pathSuffix] - path suffix to append to the directory path
  * @returns {string} - directory path
  */
-export function getDir({ pathSuffix = '' }: { pathSuffix?: string; } = {}): string {
+export function getDir({ pathSuffix = '' } = {}) {
   const __filename = fileURLToPath(import.meta.url);
   const projectRoot = getProjectRoot(__filename);
   return path.join(projectRoot, pathSuffix);
@@ -61,6 +68,5 @@ export function getFilePath(storagePath: string, fileName: string, extension: st
 export function getFileNameFromFilePath(filePath: string, withExtension: boolean = false): string {
   const fileNameWithExtension = path.basename(filePath);
   if (withExtension) return fileNameWithExtension;
-
   return path.parse(fileNameWithExtension).name;
 }

@@ -16,7 +16,7 @@ export declare function getProjectRoot(filePath: string): string;
  * @returns {string} - directory path
  */
 export declare function getDir({ pathSuffix }?: {
-    pathSuffix?: string;
+    pathSuffix?: string | undefined;
 }): string;
 /**
  * Returns a file path by joining the storage path, the file name and the file extension.

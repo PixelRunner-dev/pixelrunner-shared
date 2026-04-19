@@ -9,7 +9,13 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+/**
+ * Convert a file URL to a file path.
+ * This works in both Node and browser environments.
+ */
+function fileURLToPath(url) {
+    return new URL(url).pathname;
+}
 export function getProjectRoot(filePath) {
     let currentDir = path.dirname(path.resolve(filePath));
     while (currentDir !== '/') {
