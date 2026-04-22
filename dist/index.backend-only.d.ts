@@ -7,6 +7,7 @@
  * @copyright Pixelrunner (https://pixelrunner.dev)
  * @license CC-BY-NC-ND-4.0
  */
+export { getDir, getFilePath, getFileNameFromFilePath, getProjectRoot } from './lib/utils/PathUtils.js';
 export { ChildManager, cm } from './lib/ChildManager.js';
 export { logger } from './lib/Logger.js';
 //# sourceMappingURL=index.backend-only.d.ts.map

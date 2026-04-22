@@ -8,12 +8,6 @@
  * @license CC-BY-NC-ND-4.0
  */
 
-export {
-  getDir,
-  getFilePath,
-  getFileNameFromFilePath,
-  getProjectRoot
-} from './lib/utils/PathUtils.js';
 export { slugify } from './lib/utils/StringUtils.js';
 
 export type {

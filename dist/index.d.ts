@@ -7,7 +7,6 @@
  * @copyright Pixelrunner (https://pixelrunner.dev)
  * @license CC-BY-NC-ND-4.0
  */
-export { getDir, getFilePath, getFileNameFromFilePath, getProjectRoot } from './lib/utils/PathUtils.js';
 export { slugify } from './lib/utils/StringUtils.js';
 export type { IApplet, IAppletRecord, IAppletConfigurations, IAppletSchema, IAppletSchemaObject, IAppletViews, IFullApplet, IFullAppletRecord, IInstalledApplet, IInstalledAppletRecord, IInstallationDetails, IInstallationDetailsRecord, AppletSchemaTypes } from './lib/interfaces/IApplet.js';
 export type { IAppletDetails } from './lib/interfaces/IAppletDetails.js';
