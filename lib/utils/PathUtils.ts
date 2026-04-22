@@ -8,8 +8,14 @@
  * @license CC-BY-NC-ND-4.0
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { existsSync } from 'node:fs';
+import {
+  dirname,
+  join,
+  resolve,
+  basename,
+  parse
+} from 'node:path';
 
 /**
  * Convert a file URL to a file path.
@@ -20,13 +26,13 @@ function fileURLToPath(url: string): string {
 }
 
 export function getProjectRoot(filePath: string): string {
-  let currentDir: string = path.dirname(path.resolve(filePath));
+  let currentDir: string = dirname(resolve(filePath));
 
   while (currentDir !== '/') {
-    if (!currentDir.includes('node_modules') && fs.existsSync(path.resolve(currentDir, 'package.json'))) {
+    if (!currentDir.includes('node_modules') && existsSync(resolve(currentDir, 'package.json'))) {
       return currentDir;
     }
-    currentDir = path.dirname(currentDir);
+    currentDir = dirname(currentDir);
   }
 
   throw new Error('Could not find project root');
@@ -42,7 +48,7 @@ export function getProjectRoot(filePath: string): string {
 export function getDir({ pathSuffix = '' } = {}) {
   const __filename = fileURLToPath(import.meta.url);
   const projectRoot = getProjectRoot(__filename);
-  return path.join(projectRoot, pathSuffix);
+  return join(projectRoot, pathSuffix);
 }
 
 /**
@@ -54,8 +60,8 @@ export function getDir({ pathSuffix = '' } = {}) {
  * @returns {string} - the file path
  */
 export function getFilePath(storagePath: string, fileName: string, extension: string = 'webp'): string {
-  if (fileName.endsWith('.' + extension)) return path.resolve(storagePath, fileName);
-  return path.resolve(storagePath, fileName + '.' + extension);
+  if (fileName.endsWith('.' + extension)) return resolve(storagePath, fileName);
+  return resolve(storagePath, fileName + '.' + extension);
 }
 
 /**
@@ -66,7 +72,7 @@ export function getFilePath(storagePath: string, fileName: string, extension: st
  * @returns {string} - the file name
  */
 export function getFileNameFromFilePath(filePath: string, withExtension: boolean = false): string {
-  const fileNameWithExtension = path.basename(filePath);
+  const fileNameWithExtension = basename(filePath);
   if (withExtension) return fileNameWithExtension;
-  return path.parse(fileNameWithExtension).name;
+  return parse(fileNameWithExtension).name;
 }
