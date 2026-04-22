@@ -7,8 +7,8 @@
  * @copyright Pixelrunner (https://pixelrunner.dev)
  * @license CC-BY-NC-ND-4.0
  */
-import fs from 'node:fs';
-import path from 'node:path';
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve, basename, parse } from 'node:path';
 /**
  * Convert a file URL to a file path.
  * This works in both Node and browser environments.
@@ -17,12 +17,12 @@ function fileURLToPath(url) {
     return new URL(url).pathname;
 }
 export function getProjectRoot(filePath) {
-    let currentDir = path.dirname(path.resolve(filePath));
+    let currentDir = dirname(resolve(filePath));
     while (currentDir !== '/') {
-        if (!currentDir.includes('node_modules') && fs.existsSync(path.resolve(currentDir, 'package.json'))) {
+        if (!currentDir.includes('node_modules') && existsSync(resolve(currentDir, 'package.json'))) {
             return currentDir;
         }
-        currentDir = path.dirname(currentDir);
+        currentDir = dirname(currentDir);
     }
     throw new Error('Could not find project root');
 }
@@ -36,7 +36,7 @@ export function getProjectRoot(filePath) {
 export function getDir({ pathSuffix = '' } = {}) {
     const __filename = fileURLToPath(import.meta.url);
     const projectRoot = getProjectRoot(__filename);
-    return path.join(projectRoot, pathSuffix);
+    return join(projectRoot, pathSuffix);
 }
 /**
  * Returns a file path by joining the storage path, the file name and the file extension.
@@ -48,8 +48,8 @@ export function getDir({ pathSuffix = '' } = {}) {
  */
 export function getFilePath(storagePath, fileName, extension = 'webp') {
     if (fileName.endsWith('.' + extension))
-        return path.resolve(storagePath, fileName);
-    return path.resolve(storagePath, fileName + '.' + extension);
+        return resolve(storagePath, fileName);
+    return resolve(storagePath, fileName + '.' + extension);
 }
 /**
  * Returns the file name from a file path.
@@ -59,8 +59,8 @@ export function getFilePath(storagePath, fileName, extension = 'webp') {
  * @returns {string} - the file name
  */
 export function getFileNameFromFilePath(filePath, withExtension = false) {
-    const fileNameWithExtension = path.basename(filePath);
+    const fileNameWithExtension = basename(filePath);
     if (withExtension)
         return fileNameWithExtension;
-    return path.parse(fileNameWithExtension).name;
+    return parse(fileNameWithExtension).name;
 }

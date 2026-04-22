@@ -88,7 +88,7 @@ export type IEventData<K extends IWebSocketEventType> = Parameters<
 export interface IPendingRequest {
   resolve: (value: unknown) => void;
   reject: (reason: Error) => void;
-  timer: number;
+  timer: ReturnType<typeof setTimeout>;
   method: string;
   timestamp: number;
 }
