@@ -9,6 +9,19 @@
  */
 
 export { slugify } from './lib/utils/StringUtils.js';
+export {
+  DEFAULT_PUBLIC_IP_ENDPOINT,
+  DEFAULT_PUBLIC_IP_TIMEOUT_MS,
+  createTrysteroRoomIdFromPublicIp,
+  fetchPublicIp,
+  isPublicIp,
+  normalizeIp,
+  resolveTrysteroRoomId
+} from './lib/utils/TrysteroRoomId.js';
+export type {
+  ResolveTrysteroRoomIdOptions,
+  TrysteroRoomIdentityConfig
+} from './lib/utils/TrysteroRoomId.js';
 
 export type {
   IApplet,
