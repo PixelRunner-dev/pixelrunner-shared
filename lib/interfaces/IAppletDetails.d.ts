@@ -3,6 +3,5 @@ export interface IAppletDetails {
   summary: string;
   desc: string;
   author: string;
-  tags?: string[];
   isOfficialApplet?: boolean;
 }
