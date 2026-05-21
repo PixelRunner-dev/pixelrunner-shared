@@ -1,7 +1,7 @@
 import type { UUID } from "../types.d.ts";
 import type { IAppletDetails, IAppletImage, ICategory } from "./index.ts";
 
-type AppletSchemaTypes =
+export type AppletSchemaTypes =
   | "color"
   | "datetime"
   | "dropdown"
@@ -33,7 +33,7 @@ export type IAppletSchemaObject = {
   options?: {
     display: string;
     value: AppletConfigurationValues;
-  };
+  }[];
 
   // Generated
   source?: string;
@@ -43,13 +43,13 @@ export type IAppletSchemaObject = {
   authorizationEndpoint?: string;
   scopes?: string[];
 
-  // Test
+  // Text
   secret?: boolean;
 };
 
 export type IAppletSchema = {
   version: string;
-  notifications: [];
+  notifications?: [];
   schema: IAppletSchemaObject[];
 };
 
@@ -70,9 +70,6 @@ export interface IAppletRecord {
   details: IAppletDetails;
   fileName: string;
   packageName: string;
-  // schema?: {
-  //   [key: string]: AppletSchema;
-  // };
 }
 
 export interface IInstallationDetailsRecord {

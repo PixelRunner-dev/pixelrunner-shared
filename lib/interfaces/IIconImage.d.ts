@@ -1,5 +1,5 @@
 export interface IIconImage {
-  iconId: `icon--${string}`;
+  iconId: string;
   alt: string;
   className?: string;
   size?: number;

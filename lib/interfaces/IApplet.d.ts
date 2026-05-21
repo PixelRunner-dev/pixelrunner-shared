@@ -70,9 +70,6 @@ export interface IAppletRecord {
   details: IAppletDetails;
   fileName: string;
   packageName: string;
-  // schema?: {
-  //   [key: string]: AppletSchema;
-  // };
 }
 
 export interface IInstallationDetailsRecord {
