@@ -13,6 +13,7 @@ export type {
   IAppletViews,
   IAppletSchema,
   IAppletSchemaObject,
+  AppletConfigurationValues,
 } from "./IApplet.d.ts";
 export type { IAppletImage } from "./IAppletImage.d.ts";
 export type { IAppletDetails } from "./IAppletDetails.d.ts";

@@ -1,6 +1,6 @@
 export type * from "./standard/JsonRpc.d.ts";
 export type * from "./standard/WebSocket.d.ts";
-export type { IAppletRecord, IInstalledAppletRecord, IFullAppletRecord, IApplet, IInstalledApplet, IFullApplet, IInstallationDetails, IAppletConfigurations, IAppletViews, IAppletSchema, IAppletSchemaObject, } from "./IApplet.d.ts";
+export type { IAppletRecord, IInstalledAppletRecord, IFullAppletRecord, IApplet, IInstalledApplet, IFullApplet, IInstallationDetails, IAppletConfigurations, IAppletViews, IAppletSchema, IAppletSchemaObject, AppletConfigurationValues, } from "./IApplet.d.ts";
 export type { IAppletImage } from "./IAppletImage.d.ts";
 export type { IAppletDetails } from "./IAppletDetails.d.ts";
 export type { ICategory } from "./ICategory.d.ts";

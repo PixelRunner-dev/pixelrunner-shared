@@ -15,13 +15,13 @@ export type AppletSchemaTypes =
   | "onoff"
   | "typeahead";
 
-type AppletConfigurationValues = string | number | boolean | object;
+export type AppletConfigurationValues = string | number | boolean | object;
 
 export type IAppletSchemaObject = {
   type: AppletSchemaTypes;
   id: string;
   name: string;
-  description: string;
+  desc: string;
   icon: string;
   default?: AppletConfigurationValues;
   handler?: string;

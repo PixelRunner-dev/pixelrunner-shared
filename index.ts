@@ -36,6 +36,7 @@ export type {
   IInstalledAppletRecord,
   IInstallationDetails,
   IInstallationDetailsRecord,
+  AppletConfigurationValues,
   AppletSchemaTypes
 } from './lib/interfaces/IApplet.js';
 export type { IAppletDetails } from './lib/interfaces/IAppletDetails.js';
