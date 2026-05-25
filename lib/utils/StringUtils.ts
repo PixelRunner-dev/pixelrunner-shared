@@ -25,3 +25,13 @@ export function slugify(input: string): string {
     .replace(/^-+/, '')
     .replace(/-+$/, '');
 }
+
+/**
+ * Returns a random generated hex. Optionally limited in provided length.
+ * WARNING: This function is not safe for cryptographic usage.
+ * @param {number} length length of returning hex
+ * @returns {string} the random hex
+ */
+export function randomHex(length: number): string {
+  return Math.floor(Math.random() * 0x10000).toString(16).padStart(length, '0');
+}
