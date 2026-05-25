@@ -17,4 +17,11 @@
  * @returns {string} - the slugified string
  */
 export declare function slugify(input: string): string;
+/**
+ * Returns a random generated hex. Optionally limited in provided length.
+ * WARNING: This function is not safe for cryptographic usage.
+ * @param {number} length length of returning hex
+ * @returns {string} the random hex
+ */
+export declare function randomHex(length: number): string;
 //# sourceMappingURL=StringUtils.d.ts.map

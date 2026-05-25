@@ -7,7 +7,7 @@
  * @copyright Pixelrunner (https://pixelrunner.dev)
  * @license CC-BY-NC-ND-4.0
  */
-export { slugify } from './lib/utils/StringUtils.js';
+export { slugify, randomHex } from './lib/utils/StringUtils.js';
 export { DEFAULT_PUBLIC_IP_ENDPOINT, DEFAULT_PUBLIC_IP_TIMEOUT_MS, createTrysteroRoomIdFromPublicIp, fetchPublicIp, isPublicIp, normalizeIp, resolveTrysteroRoomId } from './lib/utils/TrysteroRoomId.js';
 export type { ResolveTrysteroRoomIdOptions, TrysteroRoomIdentityConfig } from './lib/utils/TrysteroRoomId.js';
 export type { IApplet, IAppletRecord, IAppletConfigurations, IAppletSchema, IAppletSchemaObject, IAppletViews, IFullApplet, IFullAppletRecord, IInstalledApplet, IInstalledAppletRecord, IInstallationDetails, IInstallationDetailsRecord, AppletConfigurationValues, AppletSchemaTypes } from './lib/interfaces/IApplet.js';
