@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
 
-// Mock before import
 const mockSpawn = vi.fn();
 const mockSpawnSync = vi.fn();
 
@@ -16,20 +14,25 @@ class MockChildProcess extends EventEmitter {
   public pid = 12345;
   public stdout: Readable;
   public stderr: Readable;
+  public killed = false;
 
-  constructor() {
+  constructor(withPid = true) {
     super();
+    if (!withPid) {
+      // @ts-expect-error - intentionally delete pid to test pidless handling
+      delete this.pid;
+    }
     this.stdout = new Readable({ read() {} });
     this.stderr = new Readable({ read() {} });
   }
 
   kill() {
+    this.killed = true;
     this.emit('close', 0);
     return true;
   }
 }
 
-// Import after mock setup
 const { ChildManager } = await import('../lib/ChildManager.js');
 
 describe('ChildManager', () => {
@@ -39,31 +42,83 @@ describe('ChildManager', () => {
     manager = new ChildManager();
     vi.clearAllMocks();
     mockSpawn.mockReturnValue(new MockChildProcess());
-    mockSpawnSync.mockReturnValue({
-      stdout: Buffer.from(''),
-      stderr: Buffer.from(''),
-      status: 0,
-      signal: null
-    });
   });
 
   describe('spawnCommand', () => {
-    it('spawns a command and returns result with process', () => {
-      const result = manager.spawnCommand({
-        cmd: 'echo',
-        args: ['hello']
-      });
+    it('spawns with command and args', () => {
+      manager.spawnCommand({ cmd: 'echo', args: ['hello'] });
 
-      expect(result.pid).toBeDefined();
-      expect(result.process).toBeDefined();
-      expect(result.stdoutBuffer).toBeDefined();
-      expect(result.stderrBuffer).toBeDefined();
+      expect(mockSpawn).toHaveBeenCalledWith('echo', ['hello'], expect.any(Object));
     });
 
-    it('returns streams when streamOutput is true', () => {
+    it('captures stdout data', async () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stdout.emit('data', 'hello');
+      proc.stdout.emit('data', ' world');
+
+      expect(result.stdoutBuffer).toBe('hello world');
+    });
+
+    it('captures stderr data', async () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stderr.emit('data', 'error');
+      proc.stderr.emit('data', ' message');
+
+      expect(result.stderrBuffer).toBe('error message');
+    });
+
+    it('handles Buffer input in stdout', () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stdout.emit('data', Buffer.from('buffer '));
+      proc.stdout.emit('data', Buffer.from('data'));
+
+      expect(result.stdoutBuffer).toBe('buffer data');
+    });
+
+    it('respects maxBufferBytes for stdout', () => {
+      const result = manager.spawnCommand({ cmd: 'test', maxBufferBytes: 10 });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stdout.emit('data', '12345');
+      proc.stdout.emit('data', '67890');
+      proc.stdout.emit('data', 'ABCDE');
+
+      expect(result.stdoutBuffer.length).toBeLessThanOrEqual(10);
+    });
+
+    it('respects maxBufferBytes for stderr', () => {
+      const result = manager.spawnCommand({ cmd: 'test', maxBufferBytes: 10 });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stderr.emit('data', '12345');
+      proc.stderr.emit('data', '67890');
+      proc.stderr.emit('data', 'ABCDE');
+
+      expect(result.stderrBuffer.length).toBeLessThanOrEqual(10);
+    });
+
+    it('preserves tail on buffer overflow', () => {
+      const result = manager.spawnCommand({ cmd: 'test', maxBufferBytes: 20 });
+      const proc = result.process as unknown as EventEmitter;
+
+      proc.stdout.emit('data', 'AAAAA');
+      proc.stdout.emit('data', 'BBBBB');
+      proc.stdout.emit('data', 'CCCCC');
+      proc.stdout.emit('data', 'DDDDD');
+
+      expect(result.stdoutBuffer).toContain('DDDDD');
+      expect(result.stdoutBuffer.length).toBeLessThanOrEqual(20);
+    });
+
+    it('returns streams when streamOutput enabled', () => {
       const result = manager.spawnCommand({
-        cmd: 'echo',
-        args: ['hello'],
+        cmd: 'test',
         streamOutput: true
       });
 
@@ -71,10 +126,9 @@ describe('ChildManager', () => {
       expect(result.stderrStream).toBeDefined();
     });
 
-    it('does not return streams when streamOutput is false', () => {
+    it('does not return streams when streamOutput disabled', () => {
       const result = manager.spawnCommand({
-        cmd: 'echo',
-        args: ['hello'],
+        cmd: 'test',
         streamOutput: false
       });
 
@@ -82,127 +136,262 @@ describe('ChildManager', () => {
       expect(result.stderrStream).toBeUndefined();
     });
 
-    it('respects maxBufferBytes limit', () => {
-      const result = manager.spawnCommand({
-        cmd: 'cat',
-        args: ['largefile'],
-        maxBufferBytes: 100
-      });
+    it('passes cwd to spawn', () => {
+      manager.spawnCommand({ cmd: 'test', cwd: '/tmp' });
 
-      const child = result.process as any;
-      // Simulate large data write
-      child.stdout.emit('data', Buffer.from('x'.repeat(150)));
-
-      expect(result.stdoutBuffer.length).toBeLessThanOrEqual(100);
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ cwd: '/tmp' })
+      );
     });
 
-    it('maintains buffer with circular trim on overflow', () => {
-      const result = manager.spawnCommand({
-        cmd: 'test',
-        maxBufferBytes: 50
-      });
-
-      const child = result.process as unknown as EventEmitter;
-      (child as any).stdout.emit('data', 'first part');
-      (child as any).stdout.emit('data', 'second part');
-      (child as any).stdout.emit('data', 'third part');
-
-      expect(result.stdoutBuffer.length).toBeLessThanOrEqual(50);
-      // Should preserve tail (most recent) data
-      expect(result.stdoutBuffer).toContain('third');
-    });
-
-    it('uses provided cwd and env', () => {
+    it('passes env to spawn', () => {
       const customEnv = { TEST: 'value' };
-      const result = manager.spawnCommand({
-        cmd: 'echo',
-        cwd: '/custom/path',
-        env: customEnv
-      });
+      manager.spawnCommand({ cmd: 'test', env: customEnv });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ env: customEnv })
+      );
+    });
+
+    it('enables shell when useShell true', () => {
+      manager.spawnCommand({ cmd: 'test', useShell: true });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ shell: true })
+      );
+    });
+
+    it('disables shell when useShell false', () => {
+      manager.spawnCommand({ cmd: 'test', useShell: false });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ shell: false })
+      );
+    });
+
+    it('cleans up on close event', () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+      const proc = result.process as EventEmitter;
+
+      proc.emit('close');
+
+      // Process should be cleaned up (no assertion available without exposing internals)
+      expect(result.process).toBeDefined();
+    });
+
+    it('cleans up on error event', () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+      const proc = result.process as EventEmitter;
+
+      proc.emit('error', new Error('test'));
 
       expect(result.process).toBeDefined();
     });
 
-    it('cleans up process on close event', () => {
-      const result = manager.spawnCommand({
-        cmd: 'echo'
-      });
-
-      const child = result.process as EventEmitter;
-      child.emit('close');
-
-      expect(result.process).toBeDefined();
-    });
-
-    it('cleans up process on error event', () => {
-      const result = manager.spawnCommand({
-        cmd: 'invalid-command'
-      });
-
-      const child = result.process as EventEmitter;
-      child.emit('error', new Error('Command not found'));
-
-      expect(result.process).toBeDefined();
-    });
-
-    it('tracks multiple spawned processes', () => {
-      const result1 = manager.spawnCommand({ cmd: 'cmd1' });
-      const result2 = manager.spawnCommand({ cmd: 'cmd2' });
-
-      expect(result1.process).toBeDefined();
-      expect(result2.process).toBeDefined();
-    });
-
-    it('handles processes without pid', () => {
-      const noIdProcess = new EventEmitter() as unknown as Record<string, unknown>;
-      noIdProcess.stdout = new Readable({ read() {} });
-      noIdProcess.stderr = new Readable({ read() {} });
-      delete noIdProcess.pid;
-
-      mockSpawn.mockReturnValueOnce(noIdProcess);
+    it('handles process without pid', () => {
+      const noPidProcess = new MockChildProcess(false);
+      mockSpawn.mockReturnValueOnce(noPidProcess);
 
       const result = manager.spawnCommand({ cmd: 'test' });
+
+      expect(result.pid).toBeUndefined();
       expect(result.process).toBeDefined();
+    });
+
+    it('uses default maxBuffer if not specified', () => {
+      const result = manager.spawnCommand({ cmd: 'test' });
+
+      // Default is 256KB, emit less than that
+      const proc = result.process as unknown as EventEmitter;
+      proc.stdout.emit('data', 'x'.repeat(1000));
+
+      expect(result.stdoutBuffer.length).toBe(1000);
     });
   });
 
   describe('execPromise', () => {
-    it('returns a promise', async () => {
-      const promise = manager.execPromise('echo', ['hello']);
-      expect(promise instanceof Promise).toBe(true);
+    it('returns promise with code and signal', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      const promise = manager.execPromise('test', ['arg']);
+
+      // Simulate process completion
+      setTimeout(() => {
+        proc.emit('close', 0, null);
+      }, 10);
+
+      const result = await promise;
+
+      expect(result).toMatchObject({
+        code: 0,
+        stdout: expect.any(String),
+        stderr: expect.any(String),
+        pid: expect.any(Number)
+      });
+      expect(result.signal).toBeNull();
     });
 
-    it('respects timeout option', async () => {
-      const promise = manager.execPromise('sleep', ['10'], {
-        timeoutMs: 100
-      });
+    it('captures stdout in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
 
-      expect(promise instanceof Promise).toBe(true);
+      const promise = manager.execPromise('test');
+
+      setTimeout(() => {
+        proc.stdout.emit('data', 'output');
+        proc.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result.stdout).toBe('output');
     });
 
-    it('respects maxBufferBytes option', async () => {
-      const promise = manager.execPromise('cat', ['large'], {
-        maxBufferBytes: 1024
-      });
+    it('captures stderr in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
 
-      expect(promise instanceof Promise).toBe(true);
+      const promise = manager.execPromise('test');
+
+      setTimeout(() => {
+        proc.stderr.emit('data', 'error');
+        proc.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result.stderr).toBe('error');
     });
 
-    it('passes environment variables', async () => {
-      const customEnv = { TEST_VAR: 'test_value' };
-      const promise = manager.execPromise('printenv', ['TEST_VAR'], {
-        env: customEnv
-      });
+    it('returns signal on process kill', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
 
-      expect(promise instanceof Promise).toBe(true);
+      const promise = manager.execPromise('test');
+
+      setTimeout(() => {
+        proc.emit('close', null, 'SIGTERM');
+      }, 10);
+
+      const result = await promise;
+      expect(result.signal).toBe('SIGTERM');
     });
 
-    it('supports shell execution', async () => {
-      const promise = manager.execPromise('echo hello | cat', [], {
-        useShell: true
+    it('handles process error', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      const promise = manager.execPromise('test');
+
+      setTimeout(() => {
+        proc.emit('error', new Error('spawn failed'));
+      }, 10);
+
+      await expect(promise).rejects.toThrow('spawn failed');
+    });
+
+    it('passes timeout option without error on quick completion', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      const promise = manager.execPromise('test', [], {
+        timeoutMs: 1000
       });
 
-      expect(promise instanceof Promise).toBe(true);
+      setTimeout(() => {
+        proc.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result.code).toBe(0);
+    });
+
+    it('respects maxBufferBytes in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      const promise = manager.execPromise('test', [], { maxBufferBytes: 20 });
+
+      setTimeout(() => {
+        proc.stdout.emit('data', '12345');
+        proc.stdout.emit('data', '67890');
+        proc.stdout.emit('data', 'ABCDE');
+        proc.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result.stdout.length).toBeLessThanOrEqual(20);
+    });
+
+    it('passes cwd to spawn in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      manager.execPromise('test', [], { cwd: '/custom' });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ cwd: '/custom' })
+      );
+
+      setTimeout(() => proc.emit('close', 0), 10);
+    });
+
+    it('passes env to spawn in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      const env = { TEST: 'val' };
+      manager.execPromise('test', [], { env });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ env })
+      );
+
+      setTimeout(() => proc.emit('close', 0), 10);
+    });
+
+    it('enables shell when useShell true in execPromise', async () => {
+      const proc = new MockChildProcess();
+      mockSpawn.mockReturnValueOnce(proc);
+
+      manager.execPromise('test', [], { useShell: true });
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'test',
+        [],
+        expect.objectContaining({ shell: true })
+      );
+
+      setTimeout(() => proc.emit('close', 0), 10);
+    });
+  });
+
+  describe('multiple processes', () => {
+    it('tracks multiple concurrent processes', () => {
+      const proc1 = new MockChildProcess();
+      const proc2 = new MockChildProcess();
+      proc2.pid = 67890; // Different PID
+
+      mockSpawn.mockReturnValueOnce(proc1);
+      const result1 = manager.spawnCommand({ cmd: 'cmd1' });
+
+      mockSpawn.mockReturnValueOnce(proc2);
+      const result2 = manager.spawnCommand({ cmd: 'cmd2' });
+
+      expect(result1.pid).toBe(proc1.pid);
+      expect(result2.pid).toBe(proc2.pid);
+      expect(result1.pid).not.toBe(result2.pid);
     });
   });
 });

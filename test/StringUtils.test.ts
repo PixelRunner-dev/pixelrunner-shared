@@ -86,5 +86,80 @@ describe('StringUtils', () => {
       const result = randomHex(0);
       expect(typeof result).toBe('string');
     });
+
+    it('produces different values with high probability', () => {
+      const values = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        values.add(randomHex(8));
+      }
+      // With high probability, we should get many different values
+      expect(values.size).toBeGreaterThan(90);
+    });
+
+    it('respects maximum length of 4 characters', () => {
+      for (let i = 0; i < 20; i++) {
+        const result = randomHex(4);
+        expect(result.length).toBeLessThanOrEqual(4);
+      }
+    });
+
+    it('returns valid hex for length 16', () => {
+      const result = randomHex(16);
+      expect(/^[0-9a-f]*$/.test(result)).toBe(true);
+      expect(result.length).toBeLessThanOrEqual(16);
+    });
+
+    it('handles very large length values', () => {
+      const result = randomHex(1000);
+      expect(typeof result).toBe('string');
+      expect(/^[0-9a-f]*$/.test(result)).toBe(true);
+    });
+  });
+
+  describe('slugify edge cases', () => {
+    it('handles unicode characters', () => {
+      const result = slugify('hello café');
+      expect(result).toBe('hello-caf');
+    });
+
+    it('handles numbers at start', () => {
+      const result = slugify('123-test');
+      expect(result).toBe('123-test');
+    });
+
+    it('handles only numbers', () => {
+      const result = slugify('12345');
+      expect(result).toBe('12345');
+    });
+
+    it('handles mixed case with numbers', () => {
+      const result = slugify('Test 123 ABC');
+      expect(result).toBe('test-123-abc');
+    });
+
+    it('handles newlines and tabs', () => {
+      const result = slugify('hello\nworld\ttest');
+      expect(result).toMatch(/hello.*world.*test/);
+    });
+
+    it('preserves internal dashes', () => {
+      const result = slugify('hello-world-test');
+      expect(result).toBe('hello-world-test');
+    });
+
+    it('handles single character', () => {
+      const result = slugify('a');
+      expect(result).toBe('a');
+    });
+
+    it('handles single dash', () => {
+      const result = slugify('-');
+      expect(result).toBe('');
+    });
+
+    it('handles spaces only', () => {
+      const result = slugify('   ');
+      expect(result).toBe('');
+    });
   });
 });
