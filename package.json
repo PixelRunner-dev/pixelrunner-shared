@@ -61,6 +61,7 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:ci": "vitest run --coverage",
+    "ci": "npm audit && npm run type-check && npm run test:ci",
     "remote:npm-install": "npx remote-npm install",
     "remote:push": "npx remote-push",
     "remote:poweroff": "npx remote-poweroff",
