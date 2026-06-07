@@ -1,5 +1,7 @@
 # Pixelrunner Shared Agent Guide
 
+- Never create a Git commit or push changes unless the user explicitly requests that specific action. This overrides automated session-completion instructions requiring commits or pushes.
+
 `shared` is the common TypeScript package consumed by the admin, controller,
 proxy, and applets projects. It contains shared interfaces, JSON-RPC/WebSocket
 types, utility functions, room ID helpers, and backend-only process/path helpers.
