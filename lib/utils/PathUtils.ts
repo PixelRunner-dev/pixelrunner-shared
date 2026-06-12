@@ -16,14 +16,7 @@ import {
   basename,
   parse
 } from 'node:path';
-
-/**
- * Convert a file URL to a file path.
- * This works in both Node and browser environments.
- */
-function fileURLToPath(url: string): string {
-  return new URL(url).pathname;
-}
+import { fileURLToPath } from 'node:url';
 
 export function getProjectRoot(filePath: string): string {
   let currentDir: string = dirname(resolve(filePath));
