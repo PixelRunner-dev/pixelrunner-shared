@@ -26,4 +26,4 @@ export interface IJsonRpcNotification {
   params?: IJsonRpcParams;
 }
 
-export type IJsonRpcMessage = JsonRpcResponse | IJsonRpcNotification;
+export type IJsonRpcMessage = IJsonRpcResponse | IJsonRpcNotification;
