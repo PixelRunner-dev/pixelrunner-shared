@@ -1,6 +1,8 @@
-import type { Ref, ComputedRef } from 'vue';
-
 import type { IJsonRpcParams } from '../index.ts';
+
+export interface Readable<T> {
+  readonly value: T;
+}
 
 export interface IWebSocketConfig {
   url?: string;
@@ -118,10 +120,10 @@ export interface IWebSocketClient {
   ): void;
 
   // Reactive properties
-  readonly state: Ref<IConnectionState>;
-  readonly isConnected: ComputedRef<boolean>;
-  readonly isConnecting: ComputedRef<boolean>;
-  readonly lastError: Ref<Error | null>;
+  readonly state: Readable<IConnectionState>;
+  readonly isConnected: Readable<boolean>;
+  readonly isConnecting: Readable<boolean>;
+  readonly lastError: Readable<Error | null>;
 }
 
 export interface BaseResponse {
