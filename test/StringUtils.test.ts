@@ -49,70 +49,52 @@ describe('StringUtils', () => {
   });
 
   describe('randomHex', () => {
-    it('returns hex string', () => {
-      const result = randomHex(4);
-      expect(/^[0-9a-f]+$/.test(result)).toBe(true);
+    it('returns exact length for length=4', () => {
+      expect(randomHex(4).length).toBe(4);
     });
 
-    it('respects length parameter', () => {
-      expect(randomHex(4).length).toBeLessThanOrEqual(4);
-      expect(randomHex(8).length).toBeLessThanOrEqual(8);
+    it('returns exact length for length=8', () => {
+      expect(randomHex(8).length).toBe(8);
     });
 
-    it('pads with zeros to reach length', () => {
-      // Check that multiple calls return strings of proper length
-      for (let i = 0; i < 10; i++) {
-        const hex = randomHex(4);
-        expect(hex.length).toBeLessThanOrEqual(4);
-        expect(typeof hex).toBe('string');
+    it('returns exact length for length=16', () => {
+      expect(randomHex(16).length).toBe(16);
+    });
+
+    it('returns exact length for length=1', () => {
+      expect(randomHex(1).length).toBe(1);
+    });
+
+    it('returns empty string for length=0', () => {
+      expect(randomHex(0)).toBe('');
+    });
+
+    it('returns only hex characters', () => {
+      for (let i = 0; i < 20; i++) {
+        expect(/^[0-9a-f]+$/.test(randomHex(8))).toBe(true);
       }
     });
 
-    it('returns different values on multiple calls', () => {
-      const val1 = randomHex(8);
-      const val2 = randomHex(8);
-      // Very unlikely to be equal
-      expect(val1 !== val2 || val1 === val2).toBe(true);
-    });
-
-    it('returns valid hex characters only', () => {
-      for (let i = 0; i < 10; i++) {
-        const hex = randomHex(4);
-        expect(/^[0-9a-f]*$/.test(hex)).toBe(true);
+    it('first 4 chars of length=8 result are random, not always zero', () => {
+      const prefixes = new Set<string>();
+      for (let i = 0; i < 50; i++) {
+        prefixes.add(randomHex(8).slice(0, 4));
       }
+      expect(prefixes.size).toBeGreaterThan(1);
     });
 
-    it('handles zero length', () => {
-      const result = randomHex(0);
-      expect(typeof result).toBe('string');
-    });
-
-    it('produces different values with high probability', () => {
+    it('produces unique values with high probability', () => {
       const values = new Set<string>();
       for (let i = 0; i < 100; i++) {
         values.add(randomHex(8));
       }
-      // With high probability, we should get many different values
       expect(values.size).toBeGreaterThan(90);
     });
 
-    it('respects maximum length of 4 characters', () => {
-      for (let i = 0; i < 20; i++) {
-        const result = randomHex(4);
-        expect(result.length).toBeLessThanOrEqual(4);
-      }
-    });
-
-    it('returns valid hex for length 16', () => {
-      const result = randomHex(16);
-      expect(/^[0-9a-f]*$/.test(result)).toBe(true);
-      expect(result.length).toBeLessThanOrEqual(16);
-    });
-
-    it('handles very large length values', () => {
+    it('handles very large length', () => {
       const result = randomHex(1000);
-      expect(typeof result).toBe('string');
-      expect(/^[0-9a-f]*$/.test(result)).toBe(true);
+      expect(result.length).toBe(1000);
+      expect(/^[0-9a-f]+$/.test(result)).toBe(true);
     });
   });
 
