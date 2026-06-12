@@ -35,3 +35,9 @@ export function slugify(input: string): string {
 export function randomHex(length: number): string {
   return Math.floor(Math.random() * 0x10000).toString(16).padStart(length, '0');
 }
+
+export function truncateWithEllipsis(input: string, maxLength: number): string {
+  const trimmed = input.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+  return `${trimmed.slice(0, maxLength - 3)}...`;
+}

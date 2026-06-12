@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, randomHex } from '../lib/utils/StringUtils.js';
+import { slugify, randomHex, truncateWithEllipsis } from '../lib/utils/StringUtils.js';
 
 describe('StringUtils', () => {
   describe('slugify', () => {
@@ -113,6 +113,44 @@ describe('StringUtils', () => {
       const result = randomHex(1000);
       expect(typeof result).toBe('string');
       expect(/^[0-9a-f]*$/.test(result)).toBe(true);
+    });
+  });
+
+  describe('truncateWithEllipsis', () => {
+    it('returns trimmed string within maxLength', () => {
+      expect(truncateWithEllipsis('hello', 10)).toBe('hello');
+    });
+
+    it('returns string unchanged at exactly maxLength', () => {
+      expect(truncateWithEllipsis('hello', 5)).toBe('hello');
+    });
+
+    it('truncates and appends ... when exceeding maxLength', () => {
+      expect(truncateWithEllipsis('hello world', 8)).toBe('hello...');
+    });
+
+    it('truncated result always ends with ...', () => {
+      expect(truncateWithEllipsis('verylongstring', 5)).toMatch(/\.\.\.$/);
+    });
+
+    it('trims whitespace before length check', () => {
+      expect(truncateWithEllipsis('  hello  ', 10)).toBe('hello');
+    });
+
+    it('trims before truncating long padded input', () => {
+      expect(truncateWithEllipsis('  0123456789tail  ', 11)).toBe('01234567...');
+    });
+
+    it('returns trimmed string when trim brings it within maxLength', () => {
+      expect(truncateWithEllipsis('  pxlr_27c65  ', 10)).toBe('pxlr_27c65');
+    });
+
+    it('handles exactly maxLength after trim', () => {
+      expect(truncateWithEllipsis('pxlr_27c65a', 11)).toBe('pxlr_27c65a');
+    });
+
+    it('truncates one char over maxLength', () => {
+      expect(truncateWithEllipsis('pxlr_27c65ab', 11)).toBe('pxlr_27c...');
     });
   });
 
