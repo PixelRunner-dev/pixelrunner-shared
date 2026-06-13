@@ -52,6 +52,9 @@
     "pi",
     "Noderunners"
   ],
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
   "scripts": {
     "prepare": "npm run build",
     "prepack": "npm run build",
