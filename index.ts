@@ -8,7 +8,7 @@
  * @license CC-BY-NC-ND-4.0
  */
 
-export { slugify, randomHex, truncateWithEllipsis } from './lib/utils/StringUtils.js';
+export { slugify, randomHex, truncateWithEllipsis, isUuid } from './lib/utils/StringUtils.js';
 export {
   DEFAULT_PUBLIC_IP_ENDPOINT,
   DEFAULT_PUBLIC_IP_TIMEOUT_MS,
