@@ -68,4 +68,4 @@ export type {
 export type { IMethodHandler, MethodParams, MethodResult, MethodRequest } from './lib/interfaces/ws-api/IMethodHandler.js';
 
 // Re-export type utilities
-export { UUID } from './lib/types.js';
+export type { UUID } from './lib/types.js';

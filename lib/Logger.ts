@@ -30,7 +30,7 @@ export const logger = createLogger({
   ]
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (env.NODE_ENV !== 'production') {
   addColors({ debug: 'cyan' });
 
   logger.add(
