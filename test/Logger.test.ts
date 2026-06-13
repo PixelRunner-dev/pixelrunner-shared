@@ -69,28 +69,29 @@ describe('Logger', () => {
     expect(typeof logger.add).toBe('function');
   });
 
-  it('logger respects LOG_LEVEL environment variable when set', () => {
-    const originalLogLevel = process.env.LOG_LEVEL;
-    process.env.LOG_LEVEL = 'debug';
-
+  it('adds a console transport when NODE_ENV is not production', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
     try {
-      // Environment variable is read at import time, verify it was set
-      expect(process.env.LOG_LEVEL).toBe('debug');
+      vi.resetModules();
+      await import('../lib/Logger.js');
+      expect(mockAddLogger).toHaveBeenCalled();
+      const addCall = mockAddLogger.mock.calls[0]?.[0];
+      expect(addCall).toBeInstanceOf(mockConsoleTransport);
     } finally {
-      process.env.LOG_LEVEL = originalLogLevel;
+      process.env.NODE_ENV = originalNodeEnv;
     }
   });
 
-  it('logger defaults to info level when LOG_LEVEL not set', () => {
-    const originalLogLevel = process.env.LOG_LEVEL;
-
-    try {
-      delete process.env.LOG_LEVEL;
-      // Verify fallback is available
-      expect(process.env.LOG_LEVEL).toBeUndefined();
-    } finally {
-      process.env.LOG_LEVEL = originalLogLevel;
-    }
+  it('creates file transports for error.log and combined.log', async () => {
+    vi.resetModules();
+    await import('../lib/Logger.js');
+    expect(mockFileTransport).toHaveBeenCalledTimes(2);
+    const filenames = mockFileTransport.mock.calls.map(
+      (call: [{ filename: string }]) => call[0].filename
+    );
+    expect(filenames.some((f: string) => f.includes('error.log'))).toBe(true);
+    expect(filenames.some((f: string) => f.includes('combined.log'))).toBe(true);
   });
 
   it('creates logger with file and console transports', async () => {

@@ -39,7 +39,6 @@ if (env.NODE_ENV !== 'production') {
         format.label({ label: 'Pixelrunner' }),
         format.colorize(),
         format.timestamp(),
-        // format.prettyPrint(),
         format.splat(),
         consoleFormat
       )
