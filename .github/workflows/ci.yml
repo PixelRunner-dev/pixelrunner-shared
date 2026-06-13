@@ -30,11 +30,3 @@ jobs:
 
       - name: Test
         run: npm run ci
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v7
-        if: ${{ failure() && hashFiles('coverage/**') != '' }}
-        with:
-          name: shared-test-results
-          path: coverage/
-          retention-days: 14
