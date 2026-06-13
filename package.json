@@ -55,7 +55,7 @@
   "scripts": {
     "prepare": "npm run build",
     "prepack": "npm run build",
-    "build": "tsc && cp -r lib/interfaces/*.d.ts dist/lib/interfaces && cp -r lib/interfaces/standard dist/lib/interfaces && cp -r lib/interfaces/ws-api dist/lib/interfaces && cp -r lib/types.d.ts dist/lib",
+    "build": "tsc && cp -r lib/interfaces dist/lib/ && cp -r lib/types.d.ts dist/lib",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",

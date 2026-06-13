@@ -89,10 +89,8 @@ export class ChildManager {
 
     const result: SpawnResult = {
       pid: child.pid,
-      stdoutBuffer: stdoutBuf,
-      stderrBuffer: stderrBuf,
       process: child,
-    };
+    } as SpawnResult;
 
     if (exposeStreams) {
       result.stdoutStream = child.stdout;
@@ -147,10 +145,10 @@ export class ChildManager {
       const onDataAppend = (buf: string, target: 'stdout' | 'stderr') => {
         if (target === 'stdout') {
           const combined = stdout + buf;
-          stdout = Buffer.byteLength(combined) > maxBuffer ? combined.slice(-maxBuffer) : combined;
+          stdout = Buffer.byteLength(combined, 'utf8') > maxBuffer ? combined.slice(-maxBuffer) : combined;
         } else {
           const combined = stderr + buf;
-          stderr = Buffer.byteLength(combined) > maxBuffer ? combined.slice(-maxBuffer) : combined;
+          stderr = Buffer.byteLength(combined, 'utf8') > maxBuffer ? combined.slice(-maxBuffer) : combined;
         }
       };
 
