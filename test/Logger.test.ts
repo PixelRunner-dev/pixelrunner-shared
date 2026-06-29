@@ -94,6 +94,23 @@ describe('Logger', () => {
     expect(filenames.some((f: string) => f.includes('combined.log'))).toBe(true);
   });
 
+  it('uses LOG_DIR for file transports when configured', async () => {
+    const originalLogDir = process.env.LOG_DIR;
+    process.env.LOG_DIR = '/run/pixelrunner/logs';
+    try {
+      vi.resetModules();
+      await import('../lib/Logger.js');
+      const filenames = mockFileTransport.mock.calls.map(
+        (call: [{ filename: string }]) => call[0].filename
+      );
+      expect(filenames).toContain('/run/pixelrunner/logs/error.log');
+      expect(filenames).toContain('/run/pixelrunner/logs/combined.log');
+    } finally {
+      if (originalLogDir === undefined) delete process.env.LOG_DIR;
+      else process.env.LOG_DIR = originalLogDir;
+    }
+  });
+
   it('creates logger with file and console transports', async () => {
     const { logger } = await import('../lib/Logger.js');
     expect(logger).toBeDefined();

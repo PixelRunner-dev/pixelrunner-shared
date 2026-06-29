@@ -9,6 +9,7 @@
  */
 
 import { env } from 'node:process';
+import { join } from 'node:path';
 
 import { addColors, createLogger, format, transports } from 'winston';
 
@@ -16,6 +17,8 @@ import { getDir } from './utils/PathUtils.js';
 
 const consoleFormat = format.printf(({ level, message, timestamp }): string =>
   `${timestamp} [${level}](${env.npm_package_config_project_name}): ${message}`);
+
+const logDir = env.LOG_DIR || getDir({ pathSuffix: './logs' });
 
 export const logger = createLogger({
   level: env.LOG_LEVEL ?? 'info',
@@ -25,8 +28,8 @@ export const logger = createLogger({
     format.json()
   ),
   transports: [
-    new transports.File({ filename: getDir({ pathSuffix: './logs/error.log' }), level: 'error' }),
-    new transports.File({ filename: getDir({ pathSuffix: './logs/combined.log' }) })
+    new transports.File({ filename: join(logDir, 'error.log'), level: 'error' }),
+    new transports.File({ filename: join(logDir, 'combined.log') })
   ]
 });
 
